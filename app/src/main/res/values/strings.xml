@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GetNews2</string>
+    <string name="bookmarks_message">Save your favorite news and articles to read\nthem later.</string>
+    <string name="not_found">HUMM.. NOT FOUND</string>
+    <string name="search_desc">We could not find results for your search.\nTry using another keywords.</string>
+    <string name="something_went_wrong">Something went wrong</string>
+</resources>
