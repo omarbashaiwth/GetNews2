@@ -11,9 +11,19 @@ import com.omarahmed.getnews2.databinding.ItemLatestNewsBinding
 import com.omarahmed.getnews2.util.DiffCallbackArticle
 import com.omarahmed.getnews2.util.setTimeAgo
 
-class SearchAdapter: ListAdapter<Article, SearchAdapter.SearchViewHolder>(DiffCallbackArticle()) {
+class SearchAdapter(
+    private val listener: OnItemClickListener
+): ListAdapter<Article, SearchAdapter.SearchViewHolder>(DiffCallbackArticle()) {
 
-    class SearchViewHolder(private val binding: ItemLatestNewsBinding): RecyclerView.ViewHolder(binding.root){
+    inner class SearchViewHolder(private val binding: ItemLatestNewsBinding, ): RecyclerView.ViewHolder(binding.root){
+
+        init {
+           binding.root.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION){
+                    listener.onItemClick(getItem(adapterPosition))
+                }
+           }
+        }
         fun bind(article: Article){
             binding.apply {
                 ivLatestNews.load(article.urlToImage)
@@ -27,10 +37,16 @@ class SearchAdapter: ListAdapter<Article, SearchAdapter.SearchViewHolder>(DiffCa
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
         val view = ItemLatestNewsBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-        return SearchViewHolder(view)
+        return SearchViewHolder(
+            view,
+        )
     }
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    interface OnItemClickListener{
+        fun onItemClick(article: Article)
     }
 }

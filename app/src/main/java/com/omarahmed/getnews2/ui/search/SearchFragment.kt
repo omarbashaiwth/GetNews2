@@ -8,20 +8,22 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.omarahmed.getnews2.R
+import com.omarahmed.getnews2.data.api.Article
 import com.omarahmed.getnews2.databinding.FragmentSearchBinding
 import com.omarahmed.getnews2.util.Resource
 import com.omarahmed.getnews2.util.onQueryTextSubmit
+import com.omarahmed.getnews2.util.showNews
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SearchFragment : Fragment(R.layout.fragment_search) {
+class SearchFragment : Fragment(R.layout.fragment_search), SearchAdapter.OnItemClickListener {
     private val searchViewModel: SearchViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = FragmentSearchBinding.bind(view)
-        val searchAdapter = SearchAdapter()
+        val searchAdapter = SearchAdapter(this)
 
         binding.apply {
             svSearch.apply {
@@ -60,5 +62,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 }
             }
         }
+    }
+
+    override fun onItemClick(article: Article) {
+        showNews(article.url)
     }
 }
