@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.bumptech.glide.Glide
 import com.omarahmed.getnews2.data.api.Article
 import com.omarahmed.getnews2.databinding.ItemViewPagerBinding
 import com.omarahmed.getnews2.util.setTimeAgo
