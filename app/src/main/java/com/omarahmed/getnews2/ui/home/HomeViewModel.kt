@@ -32,7 +32,23 @@ class HomeViewModel @Inject constructor(
     private val newsChannel = Channel<NewsEvents>()
     val newsEvents = newsChannel.receiveAsFlow()
 
-    val getLatestNews = repository.getLatestNews(app).asLiveData()
+    private val refreshTriggerChannel = Channel<Refresh>()
+    private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
+    var pendingScrollToTopAfterRefresh = false
+
+    val getLatestNews = refreshTrigger.flatMapLatest { refersh ->
+        repository.getLatestNews(
+            context = app,
+            forceRefresh = refersh == Refresh.FORCE,
+            onFetchSuccess = {
+                pendingScrollToTopAfterRefresh = true
+            },
+            onFetchFailed = {
+                viewModelScope.launch { newsChannel.send(NewsEvents.ShowErrorMessage(it)) }
+            }
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily,null)
+
     val getForYouNews = repository.getForYouNews(getCountry()).asLiveData()
 
     fun onBookmarkClick(newsEntity: NewsEntity) {
@@ -57,7 +73,28 @@ class HomeViewModel @Inject constructor(
         return countryName
     }
 
+    fun onManualRefresh() {
+        if (getLatestNews.value !is Resource.Loading){
+            viewModelScope.launch {
+                refreshTriggerChannel.send(Refresh.FORCE)
+            }
+        }
+    }
+
+    fun onStart() {
+        if (getLatestNews.value !is Resource.Loading){
+            viewModelScope.launch {
+                refreshTriggerChannel.send(Refresh.NORMAL)
+            }
+        }
+    }
+
+    enum class Refresh{
+        FORCE, NORMAL
+    }
+
     sealed class NewsEvents {
         data class ShowBookmarkedMessage(val msg: String) : NewsEvents()
+        data class ShowErrorMessage(val error: Throwable): NewsEvents()
     }
 }

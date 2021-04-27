@@ -64,14 +64,23 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 setPageTransformer(compositePaTransformer)
             }
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-                homeViewModel.getLatestNews.observe(viewLifecycleOwner) {
-                    val result = it ?: return@observe
-
-                    latestNewsAdapter.submitList(result.data)
+                homeViewModel.getLatestNews.collect {
+                    val result = it ?:return@collect
+                    swipeRefreshLayout.isRefreshing = result is Resource.Loading
                     progressBar.isVisible = result is Resource.Loading && result.data.isNullOrEmpty()
                     tvLatestNewsTitle.isVisible = result is Resource.Loading || !result.data.isNullOrEmpty()
+
+                    latestNewsAdapter.submitList(result.data){
+                        if (homeViewModel.pendingScrollToTopAfterRefresh){
+                            rvLatestNews.scrollToPosition(0)
+                            homeViewModel.pendingScrollToTopAfterRefresh = false
+                        }
+                    }
                 }
 
+            }
+            swipeRefreshLayout.setOnRefreshListener {
+                homeViewModel.onManualRefresh()
             }
             homeViewModel.getForYouNews.observe(viewLifecycleOwner) {
                 val result = it ?: return@observe
@@ -86,9 +95,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     is HomeViewModel.NewsEvents.ShowBookmarkedMessage -> {
                         showSnackBar(message = event.msg)
                     }
+                    is HomeViewModel.NewsEvents.ShowErrorMessage ->{
+                        showSnackBar(event.error.localizedMessage ?:"Unknown error occurred")
+                    }
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        homeViewModel.onStart()
     }
 
 }

@@ -11,6 +11,8 @@ import com.omarahmed.getnews2.util.networkBoundResource
 import com.omarahmed.getnews2.util.networkBoundResourceApiOnly
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class Repository @Inject constructor(
@@ -21,6 +23,9 @@ class Repository @Inject constructor(
 
     fun getLatestNews(
         context: Context,
+        forceRefresh: Boolean,
+        onFetchSuccess: () -> Unit,
+        onFetchFailed: (Throwable) -> Unit
     ): Flow<Resource<List<NewsEntity>>> = networkBoundResource(
         query = {
             Toast.makeText(context, "from database", Toast.LENGTH_SHORT).show()
@@ -51,8 +56,15 @@ class Repository @Inject constructor(
                 dao.insertLatestNews(newsArticles)
             }
         },
-        shouldFetch = {
-            it.isNullOrEmpty()
+        shouldFetch = { cachedNews ->
+            forceRefresh
+        },
+        onFetchSuccess = onFetchSuccess,
+        onFetchFailed = {
+            if (it !is HttpException && it !is IOException){
+                throw it
+            }
+            onFetchFailed(it)
         }
     )
 

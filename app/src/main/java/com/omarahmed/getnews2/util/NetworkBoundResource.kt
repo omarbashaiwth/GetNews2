@@ -11,24 +11,35 @@ inline fun <ResultType, RequestType> networkBoundResource(
     crossinline fetch: suspend () -> RequestType,
     crossinline saveFetchResult: suspend (RequestType) -> Unit,
     crossinline shouldFetch: (ResultType) -> Boolean = { true },
+    crossinline onFetchSuccess: () -> Unit = {},
+    crossinline onFetchFailed: (Throwable) -> Unit = {},
 
-    ) = flow {
+    ) = channelFlow {
 
     val data = query().first()
 
-    val flow = when {
+    when {
         (shouldFetch(data)) -> {
-            query().map { (Resource.Loading(it)) }
+            //Loading..
+            val loading = launch {
+                query().collect { send(Resource.Loading(it)) }
+            }
+            //Get result
             try {
                 saveFetchResult(fetch())
-                query().map { (Resource.Success(it)) }
-            } catch (throwable: Throwable) {
-                query().map { (Resource.Error(throwable, it)) }
+                onFetchSuccess()
+                loading.cancel()
+                query().collect { send (Resource.Success(it)) }
+            }
+            //Catch errors
+            catch (throwable: Throwable) {
+                onFetchFailed(throwable)
+                loading.cancel()
+                query().collect { send(Resource.Error(throwable, it)) }
             }
         }
-        else -> query().map { (Resource.Success(it)) }
+        else -> query().collect { send(Resource.Success(it)) }
     }
-    emitAll(flow)
 }
 
 inline fun <RequestType> networkBoundResourceApiOnly(
