@@ -57,7 +57,7 @@ class Repository @Inject constructor(
             }
         },
         shouldFetch = { cachedNews ->
-            forceRefresh
+            cachedNews.isEmpty() || forceRefresh
         },
         onFetchSuccess = onFetchSuccess,
         onFetchFailed = {
