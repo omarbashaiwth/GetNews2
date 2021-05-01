@@ -50,23 +50,23 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 homeViewModel.onManualRefresh()
             }
 
-                    latestNewsAdapter.submitList(result.data){
-                        if (homeViewModel.pendingScrollToTopAfterRefresh){
-                            rvLatestNews.scrollToPosition(0)
-                            homeViewModel.pendingScrollToTopAfterRefresh = false
-                        }
+            homeViewModel.news.observe(viewLifecycleOwner) {
+                val latestNews = it.first
+                swipeRefreshLayout.isRefreshing = latestNews is Resource.Loading
+                progressBar.isVisible =
+                    latestNews is Resource.Loading && latestNews.data.isNullOrEmpty()
+                tvLatestNewsTitle.isVisible =
+                    latestNews is Resource.Loading || !latestNews.data.isNullOrEmpty()
+
+                latestNewsAdapter.submitList(latestNews.data) {
+                    if (homeViewModel.pendingScrollToTopAfterRefresh) {
+                        rvLatestNews.scrollToPosition(0)
+                        homeViewModel.pendingScrollToTopAfterRefresh = false
                     }
                 }
-
-            }
-            swipeRefreshLayout.setOnRefreshListener {
-                homeViewModel.onManualRefresh()
-            }
-            homeViewModel.getForYouNews.observe(viewLifecycleOwner) {
-                val result = it ?: return@observe
-                viewPagerAdapter.submitList(result.data)
-                tvForYouTitle.isVisible = result is Resource.Loading || !result.data.isNullOrEmpty()
-
+                val forYouNews = it.second
+                viewPagerAdapter.submitList(forYouNews.data)
+                tvForYouTitle.isVisible = forYouNews is Resource.Loading || !forYouNews.data.isNullOrEmpty()
             }
 
         }
@@ -76,8 +76,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     is HomeViewModel.NewsEvents.ShowBookmarkedMessage -> {
                         showSnackBar(message = event.msg)
                     }
-                    is HomeViewModel.NewsEvents.ShowErrorMessage ->{
-                        showSnackBar(event.error.localizedMessage ?:"Unknown error occurred")
+                    is HomeViewModel.NewsEvents.ShowErrorMessage -> {
+                        showSnackBar(event.error.localizedMessage ?: "Unknown error occurred")
                     }
                 }
             }
