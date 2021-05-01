@@ -30,7 +30,11 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), CategoriesAdapter.O
                 val category = exploreViewModel.onGetCategory(position)
                 exploreViewModel.getExploreNews(category).observe(viewLifecycleOwner){result ->
                     exploreAdapter.submitList(result.data?.articles)
+
                     pbExplore.isVisible = result is Resource.Loading
+                    ivConnectionError.isVisible = result is Resource.Error
+                    tvInternetError.isVisible = result is Resource.Error
+                    tvInternetError.text = getString(R.string.check_internet_connection)
                 }
             }
             rvExplore.apply {
