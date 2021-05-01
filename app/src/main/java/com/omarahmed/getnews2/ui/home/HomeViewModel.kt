@@ -15,10 +15,7 @@ import com.omarahmed.getnews2.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -36,10 +33,10 @@ class HomeViewModel @Inject constructor(
     private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
     var pendingScrollToTopAfterRefresh = false
 
-    val getLatestNews = refreshTrigger.flatMapLatest { refersh ->
-        repository.getLatestNews(
+    val news = refreshTrigger.flatMapLatest { refresh ->
+        val latestNews = repository.getLatestNews(
             context = app,
-            forceRefresh = refersh == Refresh.FORCE,
+            forceRefresh = refresh == Refresh.FORCE,
             onFetchSuccess = {
                 pendingScrollToTopAfterRefresh = true
             },
@@ -47,9 +44,14 @@ class HomeViewModel @Inject constructor(
                 viewModelScope.launch { newsChannel.send(NewsEvents.ShowErrorMessage(it)) }
             }
         )
-    }.stateIn(viewModelScope, SharingStarted.Lazily,null)
-
-    val getForYouNews = repository.getForYouNews(getCountry()).asLiveData()
+        val forYouNews = repository.getForYouNews(
+            country = getCountry(),
+            refresh == Refresh.FORCE
+        )
+        combine(latestNews, forYouNews) { latest, forYou ->
+            Pair(latest, forYou)
+        }
+    }.asLiveData()
 
     fun onBookmarkClick(newsEntity: NewsEntity) {
         val currentBookmarked = newsEntity.isBookmarked
@@ -74,7 +76,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onManualRefresh() {
-        if (getLatestNews.value !is Resource.Loading){
+        if (news.value !is Resource.Loading<*>) {
             viewModelScope.launch {
                 refreshTriggerChannel.send(Refresh.FORCE)
             }
@@ -82,19 +84,19 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onStart() {
-        if (getLatestNews.value !is Resource.Loading){
+        if (news.value !is Resource.Loading<*>) {
             viewModelScope.launch {
                 refreshTriggerChannel.send(Refresh.NORMAL)
             }
         }
     }
 
-    enum class Refresh{
+    enum class Refresh {
         FORCE, NORMAL
     }
 
     sealed class NewsEvents {
         data class ShowBookmarkedMessage(val msg: String) : NewsEvents()
-        data class ShowErrorMessage(val error: Throwable): NewsEvents()
+        data class ShowErrorMessage(val error: Throwable) : NewsEvents()
     }
 }

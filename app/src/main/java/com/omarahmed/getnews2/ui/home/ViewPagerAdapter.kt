@@ -8,19 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.omarahmed.getnews2.data.api.Article
 import com.omarahmed.getnews2.databinding.ItemViewPagerBinding
+import com.omarahmed.getnews2.util.DiffCallbackArticle
+import com.omarahmed.getnews2.util.DiffCallbackNewsEntity
 import com.omarahmed.getnews2.util.setTimeAgo
 
 class ViewPagerAdapter(
     private val onItemClick: (Article) -> Unit
-): ListAdapter<Article, ViewPagerAdapter.ViewPagerViewHolder>(DiffCallback()) {
-
-    class DiffCallback: DiffUtil.ItemCallback<Article>() {
-        override fun areItemsTheSame(oldItem: Article, newItem: Article) =
-            oldItem.url == newItem.url
-
-        override fun areContentsTheSame(oldItem: Article, newItem: Article) =
-            oldItem == newItem
-    }
+): ListAdapter<Article, ViewPagerAdapter.ViewPagerViewHolder>(DiffCallbackArticle()) {
 
     class ViewPagerViewHolder(
         private val binding: ItemViewPagerBinding,

@@ -7,10 +7,15 @@ import android.view.View
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.snackbar.Snackbar
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 
 fun TextView.setTimeAgo(timeString: String?) {
     val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
@@ -48,6 +53,20 @@ fun Fragment.showNews(link: String) {
     val uri = Uri.parse(link)
     val intent = Intent(Intent.ACTION_VIEW, uri)
     requireActivity().startActivity(intent)
+}
+
+fun ViewPager2.setPageTransformer(pageLimit: Int, index: Int){
+    val compositePaTransformer = CompositePageTransformer()
+    compositePaTransformer.apply {
+        addTransformer(MarginPageTransformer(30))
+        addTransformer { page, position ->
+            val r = 1 - abs(position)
+            page.scaleY = 0.85f + r * 0.14f
+        }
+    }
+    setPageTransformer(compositePaTransformer)
+    offscreenPageLimit = pageLimit
+    getChildAt(index).overScrollMode = RecyclerView.OVER_SCROLL_NEVER
 }
 inline fun SearchView.onQueryTextSubmit(crossinline listener: (String) -> Unit){
     this.setOnQueryTextListener(object : SearchView.OnQueryTextListener{

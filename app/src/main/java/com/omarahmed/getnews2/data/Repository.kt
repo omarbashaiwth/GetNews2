@@ -68,7 +68,10 @@ class Repository @Inject constructor(
         }
     )
 
-    fun getForYouNews(country: String) = networkBoundResource(
+    fun getForYouNews(
+        country: String,
+        forceRefresh: Boolean
+    ) = networkBoundResource(
         query = { dao.getForYouNews() },
         fetch = { api.getForYouNews(country).articles },
         saveFetchResult = { articles ->
@@ -76,6 +79,9 @@ class Repository @Inject constructor(
                 dao.deleteAllForYouNews()
                 dao.insertForYouNews(articles)
             }
+        },
+        shouldFetch = {cashedNews ->
+            forceRefresh || cashedNews.isEmpty()
         }
     )
 
