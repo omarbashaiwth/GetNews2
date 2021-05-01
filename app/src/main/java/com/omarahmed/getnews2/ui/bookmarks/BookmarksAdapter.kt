@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.omarahmed.getnews2.R
 import com.omarahmed.getnews2.data.room.NewsEntity
 import com.omarahmed.getnews2.databinding.ItemBookmarksBinding
 import com.omarahmed.getnews2.util.DiffCallbackNewsEntity
@@ -45,7 +46,7 @@ class BookmarksAdapter(
 
         fun bind(newsEntity: NewsEntity) {
             binding.apply {
-                ivSavedNews.load(newsEntity.imageUrl)
+                ivSavedNews.load(newsEntity.imageUrl){error(R.drawable.ic_error_placeholder)}
                 tvSavedNewsTitle.text = newsEntity.title
                 tvSavedNewsDesc.text = newsEntity.desc
                 tvSavedNewsTime.setTimeAgo(newsEntity.publishedAt)

@@ -48,7 +48,7 @@ class NewsAdapter(
 
         fun bind(news: NewsEntity) {
             binding.apply {
-                ivLatestNews.load(news.imageUrl)
+                ivLatestNews.load(news.imageUrl){error(R.drawable.ic_error_placeholder)}
                 tvLatestNewsTitle.text = news.title
                 tvLatestNewsTime.setTimeAgo(news.publishedAt)
                 ivLatestNewsSave.setImageResource(

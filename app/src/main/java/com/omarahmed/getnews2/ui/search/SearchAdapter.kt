@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.omarahmed.getnews2.R
 import com.omarahmed.getnews2.data.api.Article
 import com.omarahmed.getnews2.databinding.ItemLatestNewsBinding
 import com.omarahmed.getnews2.util.DiffCallbackArticle
@@ -26,7 +27,7 @@ class SearchAdapter(
         }
         fun bind(article: Article){
             binding.apply {
-                ivLatestNews.load(article.urlToImage)
+                ivLatestNews.load(article.urlToImage){error(R.drawable.ic_error_placeholder)}
                 tvLatestNewsTitle.text = article.title
                 tvLatestNewsTime.setTimeAgo(article.publishedAt)
                 ivLatestNewsShare.isVisible = false
