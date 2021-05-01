@@ -53,10 +53,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             homeViewModel.news.observe(viewLifecycleOwner) {
                 val latestNews = it.first
                 swipeRefreshLayout.isRefreshing = latestNews is Resource.Loading
-                progressBar.isVisible =
-                    latestNews is Resource.Loading && latestNews.data.isNullOrEmpty()
-                tvLatestNewsTitle.isVisible =
-                    latestNews is Resource.Loading || !latestNews.data.isNullOrEmpty()
 
                 latestNewsAdapter.submitList(latestNews.data) {
                     if (homeViewModel.pendingScrollToTopAfterRefresh) {
@@ -66,7 +62,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 }
                 val forYouNews = it.second
                 viewPagerAdapter.submitList(forYouNews.data)
-                tvForYouTitle.isVisible = forYouNews is Resource.Loading || !forYouNews.data.isNullOrEmpty()
             }
 
         }
