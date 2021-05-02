@@ -69,10 +69,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             homeViewModel.newsEvents.collect { event ->
                 when (event) {
                     is HomeViewModel.NewsEvents.ShowBookmarkedMessage -> {
-                        showSnackBar(message = event.msg)
+                        showToastMessage(message = event.msg)
                     }
                     is HomeViewModel.NewsEvents.ShowErrorMessage -> {
-                        showSnackBar(event.error.localizedMessage ?: "Unknown error occurred")
+                        showToastMessage(event.error.localizedMessage ?: "Unknown error occurred")
                     }
                 }
             }

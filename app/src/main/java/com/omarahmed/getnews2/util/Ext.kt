@@ -1,17 +1,20 @@
 package com.omarahmed.getnews2.util
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.SearchView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.snackbar.Snackbar.make
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,12 +34,12 @@ fun TextView.setTimeAgo(timeString: String?) {
     }
 }
 
-fun Fragment.showSnackBar(
+fun Fragment.showToastMessage(
     message: String,
-    duration: Int = Snackbar.LENGTH_SHORT,
-    view: View = requireView()
+    duration: Int = Toast.LENGTH_SHORT,
+    context: Context = requireContext()
 ) {
-    Snackbar.make(view, message, duration)
+    Toast.makeText(context,message,duration)
         .show()
 }
 
