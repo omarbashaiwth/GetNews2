@@ -1,33 +1,32 @@
 package com.omarahmed.getnews2.data.room
 
 import androidx.room.*
-import com.omarahmed.getnews2.data.api.Article
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NewsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLatestNews(news: List<NewsEntity>)
+    suspend fun insertLatestNews(latestNews: List<LatestNewsEntity>)
 
-    @Query("SELECT * FROM news_table")
-    fun getLatestNews(): Flow<List<NewsEntity>>
+    @Query("SELECT * FROM latest_news_table")
+    fun getLatestNews(): Flow<List<LatestNewsEntity>>
 
-    @Query("DELETE FROM news_table")
+    @Query("DELETE FROM latest_news_table")
     suspend fun deleteAllLatestNews()
 
-    @Query("SELECT * FROM news_table WHERE isBookmarked = 1")
-    fun getBookmarkedNews(): Flow<List<NewsEntity>>
+    @Query("SELECT * FROM latest_news_table WHERE isBookmarked = 1")
+    fun getBookmarkedNews(): Flow<List<LatestNewsEntity>>
 
     @Update
-    suspend fun updateNews(newsEntity: NewsEntity)
+    suspend fun updateNews(latestNewsEntity: LatestNewsEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertForYouNews(forYouNews: List<Article>)
+    suspend fun insertForYouNews(forYouNews: List<ForYouNewsEntity>)
 
-    @Query("SELECT * FROM for_you_news")
-    fun getForYouNews(): Flow<List<Article>>
+    @Query("SELECT * FROM for_you_news_table")
+    fun getForYouNews(): Flow<List<ForYouNewsEntity>>
 
-    @Query("DELETE FROM for_you_news")
+    @Query("DELETE FROM for_you_news_table")
     suspend fun deleteAllForYouNews()
 }

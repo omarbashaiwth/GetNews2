@@ -4,16 +4,13 @@ import android.app.Application
 import android.content.Context
 import android.telephony.TelephonyManager
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.omarahmed.getnews2.data.Repository
-import com.omarahmed.getnews2.data.room.NewsEntity
+import com.omarahmed.getnews2.data.room.LatestNewsEntity
 import com.omarahmed.getnews2.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,15 +28,10 @@ class HomeViewModel @Inject constructor(
 
     private val refreshTriggerChannel = Channel<Refresh>()
     private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
-    var pendingScrollToTopAfterRefresh = false
 
     val news = refreshTrigger.flatMapLatest { refresh ->
         val latestNews = repository.getLatestNews(
-            context = app,
             forceRefresh = refresh == Refresh.FORCE,
-            onFetchSuccess = {
-                pendingScrollToTopAfterRefresh = true
-            },
             onFetchFailed = {
                 viewModelScope.launch { newsChannel.send(NewsEvents.ShowErrorMessage(it)) }
             }
@@ -53,9 +45,9 @@ class HomeViewModel @Inject constructor(
         }
     }.asLiveData()
 
-    fun onBookmarkClick(newsEntity: NewsEntity) {
-        val currentBookmarked = newsEntity.isBookmarked
-        val updateNews = newsEntity.copy(isBookmarked = !currentBookmarked)
+    fun onBookmarkClick(latestNewsEntity: LatestNewsEntity) {
+        val currentBookmarked = latestNewsEntity.isBookmarked
+        val updateNews = latestNewsEntity.copy(isBookmarked = !currentBookmarked)
         viewModelScope.launch {
             repository.updateNews(updateNews)
             if (currentBookmarked) {

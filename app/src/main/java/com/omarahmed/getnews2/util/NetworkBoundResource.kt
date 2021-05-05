@@ -1,7 +1,5 @@
 package com.omarahmed.getnews2.util
 
-import com.omarahmed.getnews2.data.api.NewsResponse
-import com.omarahmed.getnews2.data.room.NewsEntity
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.Response

@@ -53,13 +53,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             homeViewModel.news.observe(viewLifecycleOwner) {
                 val latestNews = it.first
                 swipeRefreshLayout.isRefreshing = latestNews is Resource.Loading
+                latestNewsAdapter.submitList(latestNews.data)
 
-                latestNewsAdapter.submitList(latestNews.data) {
-                    if (homeViewModel.pendingScrollToTopAfterRefresh) {
-                        rvLatestNews.scrollToPosition(0)
-                        homeViewModel.pendingScrollToTopAfterRefresh = false
-                    }
-                }
                 val forYouNews = it.second
                 viewPagerAdapter.submitList(forYouNews.data)
             }

@@ -1,11 +1,10 @@
 package com.omarahmed.getnews2.data
 
-import android.content.Context
-import android.widget.Toast
 import androidx.room.withTransaction
 import com.omarahmed.getnews2.data.api.NewsApi
+import com.omarahmed.getnews2.data.room.ForYouNewsEntity
 import com.omarahmed.getnews2.data.room.NewsDatabase
-import com.omarahmed.getnews2.data.room.NewsEntity
+import com.omarahmed.getnews2.data.room.LatestNewsEntity
 import com.omarahmed.getnews2.util.Resource
 import com.omarahmed.getnews2.util.networkBoundResource
 import com.omarahmed.getnews2.util.networkBoundResourceApiOnly
@@ -13,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class Repository @Inject constructor(
@@ -22,26 +22,18 @@ class Repository @Inject constructor(
     private val dao = db.newsDao()
 
     fun getLatestNews(
-        context: Context,
         forceRefresh: Boolean,
-        onFetchSuccess: () -> Unit,
         onFetchFailed: (Throwable) -> Unit
-    ): Flow<Resource<List<NewsEntity>>> = networkBoundResource(
-        query = {
-            Toast.makeText(context, "from database", Toast.LENGTH_SHORT).show()
-            dao.getLatestNews()
-        },
-        fetch = {
-            Toast.makeText(context, "from api", Toast.LENGTH_SHORT).show()
-            api.getLatestNews().articles
-        },
+    ): Flow<Resource<List<LatestNewsEntity>>> = networkBoundResource(
+        query = {dao.getLatestNews()},
+        fetch = {api.getLatestNews().articles},
         saveFetchResult = { articles ->
             val bookmarkedNews = dao.getBookmarkedNews().first()
-            val newsArticles = articles.map { serverNews ->
-                val isBookmarked = bookmarkedNews.any { newsEntity ->
-                    newsEntity.url == serverNews.url
+            val latestNews = articles.map { serverNews ->
+                val isBookmarked = bookmarkedNews.any { latestNewsEntity ->
+                    latestNewsEntity.url == serverNews.url
                 }
-                NewsEntity(
+                LatestNewsEntity(
                     title = serverNews.title,
                     url = serverNews.url,
                     imageUrl = serverNews.urlToImage,
@@ -53,15 +45,22 @@ class Repository @Inject constructor(
             }
             db.withTransaction {
                 dao.deleteAllLatestNews()
-                dao.insertLatestNews(newsArticles)
+                dao.insertLatestNews(latestNews)
             }
         },
         shouldFetch = { cachedNews ->
-            cachedNews.isEmpty() || forceRefresh
+            if (forceRefresh) { // to update news when the user swipe the refresh layout.
+                true
+            } else { // to update news everyday automatically
+                val sortedNews = cachedNews.sortedBy {it.updatedAt}
+                val oldestNews = sortedNews.firstOrNull()?.updatedAt
+                val needsRefresh = oldestNews == null ||
+                        oldestNews < System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
+                needsRefresh
+            }
         },
-        onFetchSuccess = onFetchSuccess,
         onFetchFailed = {
-            if (it !is HttpException && it !is IOException){
+            if (it !is HttpException && it !is IOException) {
                 throw it
             }
             onFetchFailed(it)
@@ -75,13 +74,31 @@ class Repository @Inject constructor(
         query = { dao.getForYouNews() },
         fetch = { api.getForYouNews(country).articles },
         saveFetchResult = { articles ->
+            val forYouNews = articles.map { news ->
+                ForYouNewsEntity(
+                    title = news.title,
+                    url = news.url,
+                    imageUrl = news.urlToImage,
+                    publishedAt = news.publishedAt,
+                    source = news.source.name,
+                    desc = news.description,
+                )
+            }
             db.withTransaction {
                 dao.deleteAllForYouNews()
-                dao.insertForYouNews(articles)
+                dao.insertForYouNews(forYouNews)
             }
         },
-        shouldFetch = {cashedNews ->
-            forceRefresh || cashedNews.isEmpty()
+        shouldFetch = { cashedNews ->
+            if (forceRefresh){
+                true
+            } else {
+                val sortedNews = cashedNews.sortedBy { it.updatedAt }
+                val oldestNews = sortedNews.firstOrNull()?.updatedAt
+                val needsRefresh  = oldestNews == null ||
+                        oldestNews > System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
+                needsRefresh
+            }
         }
     )
 
@@ -91,16 +108,16 @@ class Repository @Inject constructor(
         }
     )
 
-    fun getSearchNews(query:String) = networkBoundResourceApiOnly(
+    fun getSearchNews(query: String) = networkBoundResourceApiOnly(
         fetch = {
             api.getSearchNews(query)
         }
     )
 
-    suspend fun updateNews(newsEntity: NewsEntity) {
-        dao.updateNews(newsEntity)
+    suspend fun updateNews(latestNewsEntity: LatestNewsEntity) {
+        dao.updateNews(latestNewsEntity)
     }
 
-    fun getBookmarks(): Flow<List<NewsEntity>> = dao.getBookmarkedNews()
+    fun getBookmarks(): Flow<List<LatestNewsEntity>> = dao.getBookmarkedNews()
 
 }

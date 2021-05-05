@@ -2,20 +2,18 @@ package com.omarahmed.getnews2.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.omarahmed.getnews2.R
-import com.omarahmed.getnews2.data.api.Article
+import com.omarahmed.getnews2.data.room.ForYouNewsEntity
 import com.omarahmed.getnews2.databinding.ItemViewPagerBinding
-import com.omarahmed.getnews2.util.DiffCallbackArticle
-import com.omarahmed.getnews2.util.DiffCallbackNewsEntity
+import com.omarahmed.getnews2.util.DiffCallbackForYouNewsEntity
 import com.omarahmed.getnews2.util.setTimeAgo
 
 class ViewPagerAdapter(
-    private val onItemClick: (Article) -> Unit
-): ListAdapter<Article, ViewPagerAdapter.ViewPagerViewHolder>(DiffCallbackArticle()) {
+    private val onItemClick: (ForYouNewsEntity) -> Unit
+): ListAdapter<ForYouNewsEntity, ViewPagerAdapter.ViewPagerViewHolder>(DiffCallbackForYouNewsEntity()) {
 
     class ViewPagerViewHolder(
         private val binding: ItemViewPagerBinding,
@@ -29,11 +27,11 @@ class ViewPagerAdapter(
                 }
             }
         }
-        fun bind(article: Article){
+        fun bind(article: ForYouNewsEntity){
             binding.apply {
-                ivForYouNews.load(article.urlToImage){error(R.drawable.ic_error_placeholder)}
+                ivForYouNews.load(article.imageUrl){error(R.drawable.ic_error_placeholder)}
                 tvForYouTitle.text = article.title
-                tvSource.text = article.source.name
+                tvSource.text = article.source
                 tvForYouDate.setTimeAgo(article.publishedAt)
             }
         }
