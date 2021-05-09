@@ -2,7 +2,6 @@ package com.omarahmed.getnews2.ui.explore
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -13,10 +12,21 @@ import com.omarahmed.getnews2.util.DiffCallbackArticle
 import com.omarahmed.getnews2.util.setTimeAgo
 
 class ExploreAdapter(
-
+ private val onShareClick: (Article) -> Unit
 ) : ListAdapter<Article, ExploreAdapter.ExploreViewHolder>(DiffCallbackArticle()){
 
-    class ExploreViewHolder(private val binding: ItemExploreNewsBinding): RecyclerView.ViewHolder(binding.root){
+    class ExploreViewHolder(
+        private val binding: ItemExploreNewsBinding,
+        onShareClick: (Int) -> Unit
+        ): RecyclerView.ViewHolder(binding.root){
+
+        init {
+            binding.ivExploreShare.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION){
+                    onShareClick(adapterPosition)
+                }
+            }
+        }
         fun bind(article: Article){
             binding.apply {
                 ivExploreNews.load(article.urlToImage){
@@ -31,7 +41,14 @@ class ExploreAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExploreViewHolder {
         val view = ItemExploreNewsBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-        return ExploreViewHolder(view)
+        return ExploreViewHolder(view,
+            onShareClick = { position ->
+                val news = getItem(position)
+                if (news != null){
+                    onShareClick(news)
+                }
+            }
+        )
     }
 
     override fun onBindViewHolder(holder: ExploreViewHolder, position: Int) {

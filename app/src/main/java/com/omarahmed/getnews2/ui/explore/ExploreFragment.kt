@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.omarahmed.getnews2.R
 import com.omarahmed.getnews2.databinding.FragmentExploreBinding
 import com.omarahmed.getnews2.util.Resource
+import com.omarahmed.getnews2.util.showShareBottomSheet
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -22,7 +23,9 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), CategoriesAdapter.O
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentExploreBinding.bind(view)
 
-        exploreAdapter = ExploreAdapter()
+        exploreAdapter = ExploreAdapter(
+            onShareClick = {showShareBottomSheet(it.url)}
+        )
         binding.apply {
             exploreViewModel.position.observe(viewLifecycleOwner) { position ->
                 val categoriesAdapter = CategoriesAdapter(position,exploreViewModel.categories,this@ExploreFragment)
