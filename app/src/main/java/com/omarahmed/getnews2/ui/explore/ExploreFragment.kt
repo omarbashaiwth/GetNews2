@@ -24,7 +24,10 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), CategoriesAdapter.O
         val binding = FragmentExploreBinding.bind(view)
 
         exploreAdapter = ExploreAdapter(
-            onShareClick = {showShareBottomSheet(it.url)}
+            onShareClick = {showShareBottomSheet(it.url)},
+            onBookmarked = {exploreNews ->
+                exploreViewModel.onBookmarkedClick(exploreNews)
+            }
         )
         binding.apply {
             exploreViewModel.position.observe(viewLifecycleOwner) { position ->
@@ -32,7 +35,7 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), CategoriesAdapter.O
                 gvCategories.adapter = categoriesAdapter
                 val category = exploreViewModel.onGetCategory(position)
                 exploreViewModel.getExploreNews(category).observe(viewLifecycleOwner){result ->
-                    exploreAdapter.submitList(result.data?.articles)
+                    exploreAdapter.submitList(result.data)
 
                     pbExplore.isVisible = result is Resource.Loading
                     ivConnectionError.isVisible = result is Resource.Error

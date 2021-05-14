@@ -6,14 +6,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.omarahmed.getnews2.R
-import com.omarahmed.getnews2.data.room.ForYouNewsEntity
+import com.omarahmed.getnews2.data.room.NewsEntity
 import com.omarahmed.getnews2.databinding.ItemViewPagerBinding
-import com.omarahmed.getnews2.util.DiffCallbackForYouNewsEntity
+import com.omarahmed.getnews2.util.DiffCallbackNewsEntity
 import com.omarahmed.getnews2.util.setTimeAgo
 
 class ViewPagerAdapter(
-    private val onItemClick: (ForYouNewsEntity) -> Unit
-): ListAdapter<ForYouNewsEntity, ViewPagerAdapter.ViewPagerViewHolder>(DiffCallbackForYouNewsEntity()) {
+    private val onItemClick: (NewsEntity) -> Unit
+): ListAdapter<NewsEntity, ViewPagerAdapter.ViewPagerViewHolder>(DiffCallbackNewsEntity()) {
 
     class ViewPagerViewHolder(
         private val binding: ItemViewPagerBinding,
@@ -27,7 +27,7 @@ class ViewPagerAdapter(
                 }
             }
         }
-        fun bind(article: ForYouNewsEntity){
+        fun bind(article: NewsEntity){
             binding.apply {
                 ivForYouNews.load(article.imageUrl){error(R.drawable.ic_error_placeholder)}
                 tvForYouTitle.text = article.title

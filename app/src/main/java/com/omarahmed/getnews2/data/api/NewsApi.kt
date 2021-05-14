@@ -17,7 +17,7 @@ interface NewsApi {
     @GET("/v2/top-headlines?apiKey=$API_KEY&language=en")
     suspend fun getExploreNews(
         @Query("category") category: String
-    ): Response<NewsResponse>
+    ): NewsResponse
 
     @GET("/v2/top-headlines?apiKey=$API_KEY&language=en")
     suspend fun getSearchNews(

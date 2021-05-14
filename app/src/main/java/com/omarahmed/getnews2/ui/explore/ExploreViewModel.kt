@@ -1,12 +1,11 @@
 package com.omarahmed.getnews2.ui.explore
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.omarahmed.getnews2.R
 import com.omarahmed.getnews2.data.PreferencesManager
 import com.omarahmed.getnews2.data.Repository
+import com.omarahmed.getnews2.data.room.NewsEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -40,6 +39,14 @@ class ExploreViewModel @Inject constructor(
 
     fun onGetCategory(position: Int): String {
         return categories[position].title.toLowerCase(Locale.ROOT)
+    }
+
+    fun onBookmarkedClick(exploreNews: NewsEntity) {
+        val currentBookmark = exploreNews.isBookmarked
+        val updateNews = exploreNews.copy(isBookmarked = !currentBookmark)
+        viewModelScope.launch {
+            repository.updateNews(updateNews)
+        }
     }
 
 

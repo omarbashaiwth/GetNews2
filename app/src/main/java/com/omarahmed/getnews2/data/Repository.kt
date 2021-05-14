@@ -2,10 +2,8 @@ package com.omarahmed.getnews2.data
 
 import androidx.room.withTransaction
 import com.omarahmed.getnews2.data.api.NewsApi
-import com.omarahmed.getnews2.data.room.ForYouNewsEntity
 import com.omarahmed.getnews2.data.room.NewsDatabase
-import com.omarahmed.getnews2.data.room.LatestNewsEntity
-import com.omarahmed.getnews2.util.Resource
+import com.omarahmed.getnews2.data.room.NewsEntity
 import com.omarahmed.getnews2.util.networkBoundResource
 import com.omarahmed.getnews2.util.networkBoundResourceApiOnly
 import kotlinx.coroutines.flow.Flow
@@ -24,23 +22,24 @@ class Repository @Inject constructor(
     fun getLatestNews(
         forceRefresh: Boolean,
         onFetchFailed: (Throwable) -> Unit
-    ): Flow<Resource<List<LatestNewsEntity>>> = networkBoundResource(
+    ) = networkBoundResource(
         query = {dao.getLatestNews()},
         fetch = {api.getLatestNews().articles},
         saveFetchResult = { articles ->
             val bookmarkedNews = dao.getBookmarkedNews().first()
             val latestNews = articles.map { serverNews ->
-                val isBookmarked = bookmarkedNews.any { latestNewsEntity ->
-                    latestNewsEntity.url == serverNews.url
+                val isBookmarked = bookmarkedNews.any { cachedNews ->
+                    cachedNews.url == serverNews.url
                 }
-                LatestNewsEntity(
+                NewsEntity(
                     title = serverNews.title,
                     url = serverNews.url,
                     imageUrl = serverNews.urlToImage,
                     publishedAt = serverNews.publishedAt,
                     source = serverNews.source.name,
                     desc = serverNews.description,
-                    isBookmarked = isBookmarked
+                    isBookmarked = isBookmarked,
+                    newsType = "LatestNews"
                 )
             }
             db.withTransaction {
@@ -75,13 +74,15 @@ class Repository @Inject constructor(
         fetch = { api.getForYouNews(country).articles },
         saveFetchResult = { articles ->
             val forYouNews = articles.map { news ->
-                ForYouNewsEntity(
+                NewsEntity(
                     title = news.title,
                     url = news.url,
                     imageUrl = news.urlToImage,
                     publishedAt = news.publishedAt,
                     source = news.source.name,
                     desc = news.description,
+                    isBookmarked = false,
+                    newsType = "ForYouNews"
                 )
             }
             db.withTransaction {
@@ -102,11 +103,39 @@ class Repository @Inject constructor(
         }
     )
 
-    fun getExploreNews(category: String) = networkBoundResourceApiOnly(
-        fetch = {
-            api.getExploreNews(category)
+    fun getExploreNews(category: String) = networkBoundResource(
+        query = {dao.getExploreNews() },
+        fetch = {api.getExploreNews(category).articles},
+        saveFetchResult = {articles ->
+            val bookmarkedNews = dao.getBookmarkedNews().first()
+            val exploreNews = articles.map { serverNews ->
+               val isBookmarked = bookmarkedNews.any { cachedNews ->
+                   serverNews.url == cachedNews.url
+               }
+                NewsEntity(
+                    title = serverNews.title,
+                    url = serverNews.url,
+                    imageUrl = serverNews.urlToImage,
+                    publishedAt = serverNews.publishedAt,
+                    source = serverNews.source.name,
+                    desc = serverNews.description,
+                    isBookmarked = isBookmarked,
+                    newsType = "ExploreNews",
+                    category = category
+                )
+            }
+            db.withTransaction {
+                dao.clearExploreNews()
+                dao.insertExploreNews(exploreNews)
+            }
         }
     )
+
+//    fun getExploreNews(category: String) = networkBoundResourceApiOnly(
+//        fetch = {
+//            api.getExploreNews(category)
+//        }
+//    )
 
     fun getSearchNews(query: String) = networkBoundResourceApiOnly(
         fetch = {
@@ -114,10 +143,10 @@ class Repository @Inject constructor(
         }
     )
 
-    suspend fun updateNews(latestNewsEntity: LatestNewsEntity) {
+    suspend fun updateNews(latestNewsEntity: NewsEntity) {
         dao.updateNews(latestNewsEntity)
     }
 
-    fun getBookmarks(): Flow<List<LatestNewsEntity>> = dao.getBookmarkedNews()
+    fun getBookmarks(): Flow<List<NewsEntity>> = dao.getBookmarkedNews()
 
 }

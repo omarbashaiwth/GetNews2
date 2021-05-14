@@ -12,22 +12,22 @@ inline fun <ResultType, RequestType> networkBoundResource(
     crossinline onFetchSuccess: () -> Unit = {},
     crossinline onFetchFailed: (Throwable) -> Unit = {},
 
-    ) = channelFlow {
+    ) = channelFlow{
 
     val data = query().first()
 
-    when {
-        (shouldFetch(data)) -> {
+   if (shouldFetch(data)){
             //Loading..
             val loading = launch {
-                query().collect { send(Resource.Loading(it)) }
+                query().collect { send(Resource.Loading(null)) }
             }
+
             //Get result
             try {
                 saveFetchResult(fetch())
                 onFetchSuccess()
                 loading.cancel()
-                query().collect { send (Resource.Success(it)) }
+                query().collect { send(Resource.Success(it)) }
             }
             //Catch errors
             catch (throwable: Throwable) {
@@ -36,7 +36,7 @@ inline fun <ResultType, RequestType> networkBoundResource(
                 query().collect { send(Resource.Error(throwable, it)) }
             }
         }
-        else -> query().collect { send(Resource.Success(it)) }
+        else  {query().collect { send(Resource.Success(it))}
     }
 }
 
@@ -48,7 +48,7 @@ inline fun <RequestType> networkBoundResourceApiOnly(
 
     try {
         emit(Resource.Success(fetch().body()))
-    }catch (throwable: Throwable){
-        emit(Resource.Error(throwable,null))
+    } catch (throwable: Throwable) {
+        emit(Resource.Error(throwable, null))
     }
 }

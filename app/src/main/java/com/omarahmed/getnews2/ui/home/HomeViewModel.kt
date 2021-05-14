@@ -8,7 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.omarahmed.getnews2.data.Repository
-import com.omarahmed.getnews2.data.room.LatestNewsEntity
+import com.omarahmed.getnews2.data.room.NewsEntity
 import com.omarahmed.getnews2.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
             }
         )
         val forYouNews = repository.getForYouNews(
-            country = getCountry(),
+            country = "malaysia",
             refresh == Refresh.FORCE
         )
         combine(latestNews, forYouNews) { latest, forYou ->
@@ -45,7 +45,7 @@ class HomeViewModel @Inject constructor(
         }
     }.asLiveData()
 
-    fun onBookmarkClick(latestNewsEntity: LatestNewsEntity) {
+    fun onBookmarkClick(latestNewsEntity: NewsEntity) {
         val currentBookmarked = latestNewsEntity.isBookmarked
         val updateNews = latestNewsEntity.copy(isBookmarked = !currentBookmarked)
         viewModelScope.launch {

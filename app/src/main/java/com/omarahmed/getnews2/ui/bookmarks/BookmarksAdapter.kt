@@ -6,16 +6,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.omarahmed.getnews2.R
-import com.omarahmed.getnews2.data.room.LatestNewsEntity
+import com.omarahmed.getnews2.data.room.NewsEntity
 import com.omarahmed.getnews2.databinding.ItemBookmarksBinding
 import com.omarahmed.getnews2.util.DiffCallbackNewsEntity
 import com.omarahmed.getnews2.util.setTimeAgo
 
 class BookmarksAdapter(
-    private val onBookmarkClick: (LatestNewsEntity) -> Unit,
-    private val onShareClick: (LatestNewsEntity) -> Unit,
-    private val onItemClick: (LatestNewsEntity) -> Unit
-) : ListAdapter<LatestNewsEntity, BookmarksAdapter.BookmarksViewHolder>(DiffCallbackNewsEntity()) {
+    private val onBookmarkClick: (NewsEntity) -> Unit,
+    private val onShareClick: (NewsEntity) -> Unit,
+    private val onItemClick: (NewsEntity) -> Unit
+) : ListAdapter<NewsEntity, BookmarksAdapter.BookmarksViewHolder>(DiffCallbackNewsEntity()) {
 
     class BookmarksViewHolder(
         private val binding: ItemBookmarksBinding,
@@ -44,7 +44,7 @@ class BookmarksAdapter(
             }
         }
 
-        fun bind(latestNewsEntity: LatestNewsEntity) {
+        fun bind(latestNewsEntity: NewsEntity) {
             binding.apply {
                 ivSavedNews.load(latestNewsEntity.imageUrl){error(R.drawable.ic_error_placeholder)}
                 tvSavedNewsTitle.text = latestNewsEntity.title

@@ -7,26 +7,35 @@ import kotlinx.coroutines.flow.Flow
 interface NewsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLatestNews(latestNews: List<LatestNewsEntity>)
+    suspend fun insertLatestNews(latestNews: List<NewsEntity>)
 
-    @Query("SELECT * FROM latest_news_table")
-    fun getLatestNews(): Flow<List<LatestNewsEntity>>
+    @Query("SELECT * FROM news_table WHERE newsType = 'LatestNews'")
+    fun getLatestNews(): Flow<List<NewsEntity>>
 
-    @Query("DELETE FROM latest_news_table")
+    @Query("DELETE FROM news_table WHERE newsType ='LatestNews'")
     suspend fun deleteAllLatestNews()
 
-    @Query("SELECT * FROM latest_news_table WHERE isBookmarked = 1")
-    fun getBookmarkedNews(): Flow<List<LatestNewsEntity>>
+    @Query("SELECT * FROM news_table WHERE isBookmarked = 1")
+    fun getBookmarkedNews(): Flow<List<NewsEntity>>
 
     @Update
-    suspend fun updateNews(latestNewsEntity: LatestNewsEntity)
+    suspend fun updateNews(latestNewsEntity: NewsEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertForYouNews(forYouNews: List<ForYouNewsEntity>)
+    suspend fun insertForYouNews(forYouNews: List<NewsEntity>)
 
-    @Query("SELECT * FROM for_you_news_table")
-    fun getForYouNews(): Flow<List<ForYouNewsEntity>>
+    @Query("SELECT * FROM news_table WHERE newsType ='ForYouNews'")
+    fun getForYouNews(): Flow<List<NewsEntity>>
 
-    @Query("DELETE FROM for_you_news_table")
+    @Query("DELETE FROM news_table WHERE newsType ='ForYouNews'")
     suspend fun deleteAllForYouNews()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertExploreNews(exploreNews: List<NewsEntity>)
+
+    @Query("SELECT * FROM news_table WHERE newsType = 'ExploreNews'")
+    fun getExploreNews(): Flow<List<NewsEntity>>
+
+    @Query("DELETE FROM news_table WHERE newsType ='ExploreNews' AND isBookmarked = 0")
+    suspend fun clearExploreNews()
 }

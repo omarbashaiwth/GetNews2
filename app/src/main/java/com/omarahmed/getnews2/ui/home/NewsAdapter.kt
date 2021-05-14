@@ -7,16 +7,16 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.omarahmed.getnews2.R
 import com.omarahmed.getnews2.databinding.ItemLatestNewsBinding
-import com.omarahmed.getnews2.data.room.LatestNewsEntity
+import com.omarahmed.getnews2.data.room.NewsEntity
 import com.omarahmed.getnews2.ui.home.NewsAdapter.LatestNewsViewHolder
 import com.omarahmed.getnews2.util.DiffCallbackNewsEntity
 import com.omarahmed.getnews2.util.setTimeAgo
 
 class NewsAdapter(
-    private val onBookmarkClick: (LatestNewsEntity) -> Unit,
-    private val onShareClick: (LatestNewsEntity) -> Unit,
-    private val onItemClick: (LatestNewsEntity) -> Unit
-) : ListAdapter<LatestNewsEntity, LatestNewsViewHolder>(DiffCallbackNewsEntity()) {
+    private val onBookmarkClick: (NewsEntity) -> Unit,
+    private val onShareClick: (NewsEntity) -> Unit,
+    private val onItemClick: (NewsEntity) -> Unit
+) : ListAdapter<NewsEntity, LatestNewsViewHolder>(DiffCallbackNewsEntity()) {
 
     class LatestNewsViewHolder(
         private val binding: ItemLatestNewsBinding,
@@ -46,7 +46,7 @@ class NewsAdapter(
             }
         }
 
-        fun bind(latestNews: LatestNewsEntity) {
+        fun bind(latestNews: NewsEntity) {
             binding.apply {
                 ivLatestNews.load(latestNews.imageUrl){error(R.drawable.ic_error_placeholder)}
                 tvLatestNewsTitle.text = latestNews.title

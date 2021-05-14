@@ -3,7 +3,7 @@ package com.omarahmed.getnews2.ui.bookmarks
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.omarahmed.getnews2.data.Repository
-import com.omarahmed.getnews2.data.room.LatestNewsEntity
+import com.omarahmed.getnews2.data.room.NewsEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -22,7 +22,7 @@ class BookmarksViewModel @Inject constructor(
         null
     )
 
-    fun onUnBookmarkClick(newsEntity: LatestNewsEntity) {
+    fun onUnBookmarkClick(newsEntity: NewsEntity) {
        val currentBookmark = newsEntity.isBookmarked
        val updatedNews = newsEntity.copy(isBookmarked = !currentBookmark)
        viewModelScope.launch {
