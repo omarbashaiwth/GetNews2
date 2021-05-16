@@ -21,6 +21,15 @@
             android:background="@color/red"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:titleTextColor="@color/white">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bookmarks"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/courgette"
+                android:layout_gravity="center" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 

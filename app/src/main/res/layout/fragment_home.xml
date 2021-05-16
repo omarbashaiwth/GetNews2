@@ -17,8 +17,7 @@
             app:layout_scrollFlags="scroll|enterAlways|snap"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/red"
-            app:titleTextColor="@color/white">
+            android:background="@color/red">
 
             <ImageView
                 android:id="@+id/iv_search"
@@ -27,6 +26,15 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_search" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Home"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/courgette"
+                android:layout_gravity="center" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
