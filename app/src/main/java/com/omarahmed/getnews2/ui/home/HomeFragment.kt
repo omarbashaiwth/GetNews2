@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.omarahmed.getnews2.R
 import com.omarahmed.getnews2.databinding.FragmentHomeBinding
@@ -48,6 +49,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
             swipeRefreshLayout.setOnRefreshListener {
                 homeViewModel.onManualRefresh()
+            }
+            ivSearch.setOnClickListener {
+                findNavController().navigate(R.id.action_global_searchFragment)
             }
 
             homeViewModel.news.observe(viewLifecycleOwner) {

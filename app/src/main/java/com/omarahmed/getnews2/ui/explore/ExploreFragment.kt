@@ -5,6 +5,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.omarahmed.getnews2.R
 import com.omarahmed.getnews2.databinding.FragmentExploreBinding
@@ -30,6 +31,9 @@ class ExploreFragment : Fragment(R.layout.fragment_explore), CategoriesAdapter.O
             }
         )
         binding.apply {
+            ivSearch.setOnClickListener {
+                findNavController().navigate(R.id.action_global_searchFragment)
+            }
             exploreViewModel.position.observe(viewLifecycleOwner) { position ->
                 val categoriesAdapter = CategoriesAdapter(position,exploreViewModel.categories,this@ExploreFragment)
                 gvCategories.adapter = categoriesAdapter

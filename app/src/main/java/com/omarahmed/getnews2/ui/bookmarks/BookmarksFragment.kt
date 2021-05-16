@@ -1,6 +1,9 @@
 package com.omarahmed.getnews2.ui.bookmarks
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -31,6 +34,18 @@ class BookmarksFragment : Fragment(R.layout.fragment_bookmarks) {
         )
 
         binding.apply {
+            toolbar.apply {
+                inflateMenu(R.menu.bookmarked_menu)
+                setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId){
+                        R.id.delete_all ->{
+                            bookmarksViewModel.onDeleteAllBookmarked()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            }
             rvBookmarks.apply {
                 adapter = bookmarksAdapter
                 layoutManager = GridLayoutManager(requireContext(),2)
@@ -47,4 +62,5 @@ class BookmarksFragment : Fragment(R.layout.fragment_bookmarks) {
             }
         }
     }
+
 }

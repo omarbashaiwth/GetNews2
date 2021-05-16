@@ -6,6 +6,7 @@ import com.omarahmed.getnews2.data.Repository
 import com.omarahmed.getnews2.data.room.NewsEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BookmarksViewModel @Inject constructor(
     private val repository: Repository
-): ViewModel() {
+) : ViewModel() {
 
 
     val getBookmarks = repository.getBookmarks().stateIn(
@@ -23,11 +24,17 @@ class BookmarksViewModel @Inject constructor(
     )
 
     fun onUnBookmarkClick(newsEntity: NewsEntity) {
-       val currentBookmark = newsEntity.isBookmarked
-       val updatedNews = newsEntity.copy(isBookmarked = !currentBookmark)
-       viewModelScope.launch {
-           repository.updateNews(updatedNews)
-       }
+        val currentBookmark = newsEntity.isBookmarked
+        val updatedNews = newsEntity.copy(isBookmarked = !currentBookmark)
+        viewModelScope.launch {
+            repository.updateNews(updatedNews)
+        }
+    }
+
+    fun onDeleteAllBookmarked() {
+        viewModelScope.launch {
+            repository.deleteAllBookmarked()
+        }
     }
 
 }

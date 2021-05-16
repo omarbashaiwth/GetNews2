@@ -149,4 +149,6 @@ class Repository @Inject constructor(
 
     fun getBookmarks(): Flow<List<NewsEntity>> = dao.getBookmarkedNews()
 
+    suspend fun deleteAllBookmarked() = dao.deleteAllBookmarked()
+
 }

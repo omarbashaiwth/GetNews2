@@ -18,6 +18,9 @@ interface NewsDao {
     @Query("SELECT * FROM news_table WHERE isBookmarked = 1")
     fun getBookmarkedNews(): Flow<List<NewsEntity>>
 
+    @Query("UPDATE news_table SET isBookmarked = 0")
+    suspend fun deleteAllBookmarked()
+
     @Update
     suspend fun updateNews(latestNewsEntity: NewsEntity)
 
