@@ -4,17 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.text.format.DateUtils
-import android.view.View
-import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.snackbar.Snackbar.make
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -71,7 +68,9 @@ fun ViewPager2.setPageTransformer(pageLimit: Int, index: Int){
     offscreenPageLimit = pageLimit
     getChildAt(index).overScrollMode = RecyclerView.OVER_SCROLL_NEVER
 }
-inline fun SearchView.onQueryTextSubmit(crossinline listener: (String) -> Unit){
+inline fun SearchView.onQueryTextSubmit(
+    crossinline listener: (String) -> Unit,
+){
     this.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
         override fun onQueryTextSubmit(query: String?): Boolean {
             listener(query.orEmpty())

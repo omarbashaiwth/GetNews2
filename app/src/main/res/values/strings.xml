@@ -5,4 +5,5 @@
     <string name="search_desc">We could not find results for your search.\nTry using another keywords.</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="check_internet_connection">Check Your Internet Connection</string>
+    <string name="search_for_news">Search for news</string>
 </resources>

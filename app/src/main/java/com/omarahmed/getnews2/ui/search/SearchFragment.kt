@@ -1,8 +1,9 @@
 package com.omarahmed.getnews2.ui.search
 
 import android.os.Bundle
-import android.view.View
-import androidx.core.content.ContextCompat
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -27,19 +28,15 @@ class SearchFragment : Fragment(R.layout.fragment_search), SearchAdapter.OnItemC
         val searchAdapter = SearchAdapter(this)
 
         binding.apply {
-            svSearch.apply {
-                onActionViewExpanded()
-                onQueryTextSubmit { query ->
-                    viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                        searchViewModel.searchQuery.emit(query)
-                    }
-                    clearFocus()
+            toolbar.apply {
+                (requireActivity() as AppCompatActivity).setSupportActionBar(this)
+                setHasOptionsMenu(true)
+                setNavigationOnClickListener {
+                    findNavController().popBackStack()
                 }
             }
+
             rvSearch.adapter = searchAdapter
-            ivBack.setOnClickListener {
-                findNavController().popBackStack()
-            }
             searchViewModel.getSearchNews.observe(viewLifecycleOwner) {
                 val result = it ?: return@observe
                 searchAdapter.submitList(result.data?.articles)
@@ -61,6 +58,23 @@ class SearchFragment : Fragment(R.layout.fragment_search), SearchAdapter.OnItemC
                     tvTitleSearch.text = getString(R.string.not_found)
                     tvDescSearch.text = getString(R.string.search_desc)
                 }
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_menu,menu)
+        val searchItem = menu.findItem(R.id.searchNews)
+        val searchView = searchItem.actionView as SearchView
+        searchView.apply {
+            queryHint = this.context.getString(R.string.search_for_news)
+            onActionViewExpanded()
+            isQueryRefinementEnabled = true
+            onQueryTextSubmit{
+                viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                    searchViewModel.searchQuery.emit(it)
+                }
+                clearFocus()
             }
         }
     }
