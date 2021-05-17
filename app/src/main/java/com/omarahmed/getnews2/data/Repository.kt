@@ -51,8 +51,7 @@ class Repository @Inject constructor(
             if (forceRefresh) { // to update news when the user swipe the refresh layout.
                 true
             } else { // to update news everyday automatically
-                val sortedNews = cachedNews.sortedBy {it.updatedAt}
-                val oldestNews = sortedNews.firstOrNull()?.updatedAt
+                val oldestNews = cachedNews.firstOrNull()?.updatedAt
                 val needsRefresh = oldestNews == null ||
                         oldestNews < System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
                 needsRefresh
@@ -90,14 +89,13 @@ class Repository @Inject constructor(
                 dao.insertForYouNews(forYouNews)
             }
         },
-        shouldFetch = { cashedNews ->
+        shouldFetch = { cachedNews ->
             if (forceRefresh){
                 true
-            } else {
-                val sortedNews = cashedNews.sortedBy { it.updatedAt }
-                val oldestNews = sortedNews.firstOrNull()?.updatedAt
-                val needsRefresh  = oldestNews == null ||
-                        oldestNews > System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
+            } else { // to update news everyday automatically
+                val oldestNews = cachedNews.firstOrNull()?.updatedAt
+                val needsRefresh = oldestNews == null ||
+                        oldestNews < System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
                 needsRefresh
             }
         }
