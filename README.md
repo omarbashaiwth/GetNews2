@@ -1,5 +1,5 @@
 # About this app:
-This is a news app that retrieves news from https://newsapi.org/v2/. I made this app mainly to practice REST Api using the new Jetpack libraries such as Coroutines and Flow.
+This is a news app that retrieves news from https://newsapi.org/v2/. I made this app mainly to practice RESTful Api using the new Jetpack libraries such as Coroutines and Flow.
 The following are the technologies and libraries that I applied in building this app:
 1) Retrofit to retrieve data from the API server.
 2) Hilt dagger for dependency injection.
