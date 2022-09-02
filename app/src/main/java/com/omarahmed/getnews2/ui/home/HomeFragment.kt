@@ -21,7 +21,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private val homeViewModel: HomeViewModel by viewModels()
 
-    @ExperimentalCoroutinesApi
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

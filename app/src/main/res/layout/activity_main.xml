@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/white"
+        app:itemIconTint="@color/icon_tint_nav"
         app:labelVisibilityMode="selected"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:menu="@menu/bottom_nav_menu" />
